@@ -6,7 +6,7 @@ import { FcLike } from "react-icons/fc";
 import imgPlaceholder from '../assets/robot image.jpg'
 import authorPlaceholder from '../assets/author.webp'
 
-const API_URL = 'http://localhost:3000/api/posts'
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}api/posts`
 
 export default function Home() {
   const [posts, setPosts] = useState([])
@@ -45,7 +45,7 @@ export default function Home() {
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 py-12 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          
+
           <div className="lg:col-span-12 xl:col-span-7">
             {featuredPost ? (
               <Link to={`/post/${featuredPost.id}`} className="group cursor-pointer block">
@@ -101,7 +101,7 @@ export default function Home() {
             )}
           </div>
 
-       
+
           <div className="lg:col-span-12 xl:col-span-5 space-y-8">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <span className="w-8 h-1 bg-blue-600 rounded-full"></span>

@@ -103,9 +103,9 @@ const Dashboard = () => {
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <a href="/Settings" className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">
+                            <Link to="/Settings" className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">
                                 Edit Profile
-                            </a>
+                            </Link>
                             <button
                                 onClick={() => {
                                     localStorage.removeItem('token');

@@ -101,7 +101,7 @@ const NavList = ({ user }) => {
     { label: "Dashboard", href: "/AdminDashboard", adminOnly: true },
     { label: "Users", href: "#", adminOnly: true },
     { label: "Pending Requests", href: "#", adminOnly: true },
-    { label: "Help & Support", href: "#", public: true },
+    { label: "Help & Support", href: "/Support", public: true },
   ];
 
   const filteredItems = allItems.filter(item => {

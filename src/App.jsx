@@ -10,6 +10,7 @@ import AdminDashboard from './Components/AdminDashboard'
 import Teams from './Components/Teams';
 import Passwordreset from './Components/Passwordreset'
 import Register from './Components/Register'
+import Support from './Components/Support'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/AdminDashboard" element={<AdminDashboard />} />
           <Route path="/Teams" element={<Teams />} />
           <Route path="/Passwordreset" element={<Passwordreset />} />
+          <Route path="/Support" element={<Support />} />
 
         </Routes>
       </Router>

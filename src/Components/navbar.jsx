@@ -232,6 +232,15 @@ const Navbar = () => {
 
 
             <div className="flex lg:hidden items-center gap-3">
+              <Link to="/Notifications" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                <FaBell className="w-5 h-5 text-gray-600 dark:text-slate-400" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                  </span>
+                )}
+              </Link>
               <ProfileMenu user={user} />
               <button
                 onClick={() => setIsNavOpen(!isNavOpen)}

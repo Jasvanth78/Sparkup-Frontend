@@ -56,8 +56,8 @@ const PostIdea = () => {
     };
 
     const processFile = (file) => {
-        if (file.size > 2 * 1024 * 1024) {
-            toast.error('Image size should be less than 2MB');
+        if (file.size > 50 * 1024 * 1024) {
+            toast.error('Image size should be less than 50MB');
             return;
         }
         const reader = new FileReader();
@@ -111,7 +111,7 @@ const PostIdea = () => {
             <Navbar />
 
             <main className="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-                
+
                 <div className="mb-8 text-center animate-fade-in-down">
                     <div className="inline-flex items-center justify-center p-3 mb-4 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                         <FaLightbulb className="w-6 h-6" />
@@ -143,7 +143,7 @@ const PostIdea = () => {
                             />
                         </div>
 
-                     
+
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
                                 Cover Image
@@ -205,7 +205,7 @@ const PostIdea = () => {
                             </div>
                         </div>
 
-                      
+
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
                                 Description
@@ -260,7 +260,7 @@ const PostIdea = () => {
                             </div>
                         </div>
 
-                       
+
                         <div className="pt-6 flex flex-col-reverse sm:flex-row gap-4">
                             <button
                                 type="button"

@@ -11,6 +11,8 @@ import Teams from './Components/Teams';
 import Passwordreset from './Components/Passwordreset'
 import Register from './Components/Register'
 import Support from './Components/Support'
+import ProtectedRoute from './Components/ProtectedRoute'
+import Notification from './Components/Notification'
 
 function App() {
   return (
@@ -20,11 +22,12 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Home" element={<Home />} />
+          <Route path="/Notifications" element={<Notification />} />
           <Route path="/Settings" element={<Settings />} />
           <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/post-idea" element={<PostIdea />} />
           <Route path="/post/:id" element={<PostDetail />} />
-          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/AdminDashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/Teams" element={<Teams />} />
           <Route path="/Passwordreset" element={<Passwordreset />} />
           <Route path="/Support" element={<Support />} />

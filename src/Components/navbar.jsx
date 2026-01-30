@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaBell } from "react-icons/fa";
 import { useTheme } from "../Context/ThemeContext";
 
 const ProfileMenu = ({ user }) => {
@@ -128,7 +128,29 @@ const NavList = ({ user }) => {
 const Navbar = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+
+  const fetchUnreadCount = async (token, role) => {
+    try {
+      if (!token) return;
+      const userId = parseJwt(token).id;
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/notifications/unread/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUnreadCount(response.data.unreadCount);
+    } catch (error) {
+      console.error("Failed to fetch unread count", error);
+    }
+  };
+
+  const parseJwt = (token) => {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return {};
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -155,6 +177,7 @@ const Navbar = () => {
           } else {
             setUser(response.data);
           }
+          fetchUnreadCount(token, role);
         }
       } catch (error) {
         console.error("Failed to fetch user in navbar", error);
@@ -192,6 +215,17 @@ const Navbar = () => {
               <button className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
                 Invite Your Friends
               </button>
+
+              <Link to="/Notifications" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
+                <FaBell className="w-5 h-5 text-gray-600 dark:text-slate-400" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                  </span>
+                )}
+              </Link>
+
               <div className="h-6 w-px bg-gray-200 dark:bg-slate-800 mx-1"></div>
               <ProfileMenu user={user} />
             </div>

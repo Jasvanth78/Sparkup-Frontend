@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { RiInstagramFill } from "react-icons/ri";
 import { FaLinkedinIn } from "react-icons/fa";
 import { IoMailUnread } from "react-icons/io5";
+import authorPlaceholder from '../assets/author.webp';
 const Settings = () => {
     // Initialize with default values to avoid "undefined" errors
     const [user, setUser] = useState({
@@ -55,7 +56,7 @@ const Settings = () => {
                 });
                 setUser({
                     ...response.data,
-                    image: response.data.image || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80',
+                    image: response.data.image || '',
                     about: response.data.about || '',
                     instagram: response.data.instagram || '',
                     linkedin: response.data.linkedin || '',
@@ -99,7 +100,7 @@ const Settings = () => {
             toast.success('Profile updated successfully');
             setUser({
                 ...response.data,
-                image: response.data.image || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80',
+                image: response.data.image || '',
                 about: response.data.about || '',
                 instagram: response.data.instagram || '',
                 linkedin: response.data.linkedin || '',
@@ -163,7 +164,7 @@ const Settings = () => {
                                     className="w-32 h-32 md:w-40 md:h-40 rounded-full p-1 border-2 border-gray-100 dark:border-slate-800 cursor-pointer overflow-hidden relative group shadow-lg transition-transform hover:scale-105"
                                 >
                                     <img
-                                        src={user.image}
+                                        src={user.image || authorPlaceholder}
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />

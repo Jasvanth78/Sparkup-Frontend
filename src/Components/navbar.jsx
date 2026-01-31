@@ -3,11 +3,11 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { FaPlus, FaBell } from "react-icons/fa";
 import { useTheme } from "../Context/ThemeContext";
+import authorPlaceholder from "../assets/author.webp";
 
 const ProfileMenu = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
-  const defaultAvatar = "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80";
 
   return (
     <div className="relative">
@@ -16,7 +16,7 @@ const ProfileMenu = ({ user }) => {
         className="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
       >
         <img
-          src={user?.image || defaultAvatar}
+          src={user?.image || authorPlaceholder}
           alt="User avatar"
           className="w-8 h-8 rounded-full object-cover border border-gray-200 dark:border-slate-700"
         />
@@ -169,13 +169,15 @@ const Navbar = () => {
 
           if (role === 'ADMIN') {
             // Normalize admin data to match user structure expected by UI
-            setUser({
+            const adminUser = {
               ...response.data,
               name: 'Admin', // Admin model doesn't have name
-              // Use existing image or fallback will handle it
-            });
+            };
+            setUser(adminUser);
+            localStorage.setItem("user", JSON.stringify(adminUser));
           } else {
             setUser(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data));
           }
           fetchUnreadCount(token, role);
         }

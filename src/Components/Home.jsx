@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'
 import Navbar from './navbar'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
-import { FcLike } from "react-icons/fc";
-import imgPlaceholder from '../assets/robot image.jpg'
+import { AiOutlineLike, AiOutlineMessage } from "react-icons/ai";
+import { formatDistanceToNow } from 'date-fns';
+const postPlaceholder = "https://images.unsplash.com/photo-1519389950473-acc799a6d401?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80";
 import authorPlaceholder from '../assets/author.webp'
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}api/posts`
@@ -54,7 +55,7 @@ export default function Home() {
                 <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-slate-800 transition-all hover:shadow-2xl">
                   <div className="relative aspect-video overflow-hidden">
                     <img
-                      src={featuredPost.image || imgPlaceholder}
+                      src={featuredPost.image || postPlaceholder}
                       alt={featuredPost.title}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
                     />
@@ -89,9 +90,22 @@ export default function Home() {
                       {featuredPost.content}
                     </p>
 
-                    <div className="inline-flex items-center text-blue-600 font-bold group/link">
-                      Read Full Article
-                      <span className="ml-2 transition-transform group-hover/link:translate-x-1">→</span>
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className="inline-flex items-center text-blue-600 font-bold group/link">
+                        Read Full Article
+                        <span className="ml-2 transition-transform group-hover/link:translate-x-1">→</span>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-sm">
+                          <AiOutlineLike className="text-lg" />
+                          <span>{featuredPost._count?.likes || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-sm">
+                          <AiOutlineMessage className="text-lg" />
+                          <span>{featuredPost._count?.comments || 0}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -130,15 +144,28 @@ export default function Home() {
                       {post.title}
                     </h4>
 
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      <span className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-[10px] font-medium text-gray-600 dark:text-slate-400">Innovation</span>
-                      <span className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-[10px] font-medium text-gray-600 dark:text-slate-400">Tech</span>
+                    <div className="flex items-center justify-between gap-2 mt-3">
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-[10px] font-medium text-gray-600 dark:text-slate-400">Innovation</span>
+                        <span className="px-2 py-0.5 bg-gray-100 dark:bg-slate-800 rounded text-[10px] font-medium text-gray-600 dark:text-slate-400">Tech</span>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1 text-slate-400 font-bold text-[11px]">
+                          <AiOutlineLike size={14} />
+                          <span>{post._count?.likes || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-slate-400 font-bold text-[11px]">
+                          <AiOutlineMessage size={14} />
+                          <span>{post._count?.comments || 0}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden shrink-0 border border-gray-100 dark:border-slate-800">
                     <img
-                      src={post.image || imgPlaceholder}
+                      src={post.image || postPlaceholder}
                       alt={post.title}
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                     />

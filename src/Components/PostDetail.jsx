@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
+import { formatDistanceToNow } from 'date-fns';
 import Navbar from './navbar';
 import authorPlaceholder from '../assets/author.webp';
-import imgPlaceholder from '../assets/robot image.jpg';
+const postPlaceholder = "https://images.unsplash.com/photo-1519389950473-acc799a6d401?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80";
 
 const PostDetail = () => {
     const { id } = useParams();
@@ -19,7 +21,36 @@ const PostDetail = () => {
     const [submittingComment, setSubmittingComment] = useState(false);
     const navigate = useNavigate();
 
-    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const [currentUser, setCurrentUser] = useState(() => {
+        const savedUser = localStorage.getItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+
+    useEffect(() => {
+        // Fallback: If token exists but user doesn't, fetch user
+        const fetchUserIfNeeded = async () => {
+            const token = localStorage.getItem('token');
+            if (token && !currentUser) {
+                try {
+                    const role = localStorage.getItem('role');
+                    const endpoint = role === 'ADMIN'
+                        ? `${import.meta.env.VITE_API_BASE_URL}api/admin/me`
+                        : `${import.meta.env.VITE_API_BASE_URL}api/users/me`;
+
+                    const res = await axios.get(endpoint, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+
+                    const userData = role === 'ADMIN' ? { ...res.data, name: 'Admin' } : res.data;
+                    setCurrentUser(userData);
+                    localStorage.setItem('user', JSON.stringify(userData));
+                } catch (err) {
+                    console.error("Failed to fetch user in PostDetail", err);
+                }
+            }
+        };
+        fetchUserIfNeeded();
+    }, [currentUser]);
 
     useEffect(() => {
         const fetchPost = async () => {
@@ -124,6 +155,26 @@ const PostDetail = () => {
         }
     };
 
+    const handleLikeComment = async (commentId) => {
+        if (!currentUser) {
+            toast.error('Please login to like comments');
+            return;
+        }
+
+        try {
+            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/comment/${commentId}/like`, {
+                userId: currentUser.id
+            });
+
+            // Refresh comments to get new counts and like status
+            const commentsRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/comments`);
+            setComments(commentsRes.data);
+        } catch (error) {
+            console.error('Error liking comment:', error);
+            toast.error('Failed to like comment');
+        }
+    };
+
     if (loading) return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
             <Navbar />
@@ -159,7 +210,7 @@ const PostDetail = () => {
 
                     <div className="aspect-video sm:aspect-[21/9] w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-slate-100 dark:border-slate-800 mb-12">
                         <img
-                            src={post.image || imgPlaceholder}
+                            src={post.image || postPlaceholder}
                             alt={post.title}
                             className="w-full h-full object-cover"
                         />
@@ -178,8 +229,8 @@ const PostDetail = () => {
                                 <button
                                     onClick={handleLike}
                                     className={`flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-colors border ${liked
-                                            ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-900/50'
-                                            : 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/40 border-transparent dark:border-pink-900/30'
+                                        ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-900/50'
+                                        : 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/40 border-transparent dark:border-pink-900/30'
                                         }`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill={liked ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
@@ -194,7 +245,7 @@ const PostDetail = () => {
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                                     </svg>
-                                    {showComments ? 'Hide' : 'Show'} Comments ({commentCount})
+                                    {showComments ? 'Hide Comments' : (commentCount === 0 ? 'Be the first to comment' : `Show Comments (${commentCount})`)}
                                 </button>
                             </div>
                             <button
@@ -207,64 +258,115 @@ const PostDetail = () => {
 
                         {/* Comments Section */}
                         {showComments && (
-                            <div className="mt-8 space-y-6">
-                                {/* Add Comment Form */}
-                                {currentUser && (
-                                    <form onSubmit={handleAddComment} className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-                                        <textarea
-                                            value={newComment}
-                                            onChange={(e) => setNewComment(e.target.value)}
-                                            placeholder="Share your thoughts..."
-                                            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                                            rows="3"
+                            <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
+                                    Discussion ({commentCount})
+                                </h3>
+
+                                {/* Add Comment Input at Top - Always shows when logged in if comments are expanded */}
+                                {currentUser ? (
+                                    <div className="flex gap-4 mb-10">
+                                        <img
+                                            src={currentUser.image || authorPlaceholder}
+                                            alt={currentUser.name}
+                                            className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 dark:border-slate-800 shrink-0"
                                         />
-                                        <div className="flex justify-end mt-3">
-                                            <button
-                                                type="submit"
-                                                disabled={submittingComment || !newComment.trim()}
-                                                className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                            >
-                                                {submittingComment ? 'Posting...' : 'Post Comment'}
-                                            </button>
+                                        <div className="flex-1">
+                                            <form onSubmit={handleAddComment}>
+                                                <div className="relative">
+                                                    <textarea
+                                                        value={newComment}
+                                                        onChange={(e) => setNewComment(e.target.value)}
+                                                        placeholder="Write a comment..."
+                                                        className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-4 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all resize-none"
+                                                        rows="2"
+                                                    />
+                                                    <div className="flex justify-end mt-3">
+                                                        <button
+                                                            type="submit"
+                                                            disabled={submittingComment || !newComment.trim()}
+                                                            className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                                        >
+                                                            {submittingComment ? 'Posting...' : 'Post Comment'}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
-                                    </form>
+                                    </div>
+                                ) : (
+                                    <div className="mb-10 p-6 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                                        <p className="text-slate-500 dark:text-slate-400 font-medium mb-3">Login to join the discussion</p>
+                                        <button
+                                            onClick={() => navigate('/Login')}
+                                            className="text-blue-600 font-bold hover:underline"
+                                        >
+                                            Sign in here
+                                        </button>
+                                    </div>
                                 )}
 
                                 {/* Comments List */}
-                                <div className="space-y-4">
+                                <div className="space-y-8">
                                     {comments.length === 0 ? (
-                                        <p className="text-center text-slate-500 dark:text-slate-400 py-8">No comments yet. Be the first to comment!</p>
+                                        <div className="text-center py-12 bg-slate-50 dark:bg-slate-900/40 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                            <p className="text-slate-500 dark:text-slate-400 font-medium">No comments yet. Be the first to start the discussion!</p>
+                                        </div>
                                     ) : (
-                                        comments.map((comment) => (
-                                            <div key={comment.id} className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
-                                                <div className="flex items-start gap-4">
+                                        comments.map((comment) => {
+                                            const isLikedByMe = currentUser && comment.commentlikes?.some(like => like.userId === currentUser.id);
+
+                                            return (
+                                                <div key={comment.id} className="group flex gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                                     <img
                                                         src={comment.user?.image || authorPlaceholder}
                                                         alt={comment.user?.name}
-                                                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 dark:border-slate-800"
+                                                        className="w-10 h-10 rounded-full object-cover border-2 border-slate-100 dark:border-slate-800 shrink-0"
                                                     />
-                                                    <div className="flex-1">
-                                                        <div className="flex items-center justify-between mb-2">
-                                                            <div>
-                                                                <h4 className="font-bold text-slate-900 dark:text-white">{comment.user?.name}</h4>
-                                                                <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                                    {new Date(comment.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
-                                                                </p>
-                                                            </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <h4 className="font-bold text-slate-900 dark:text-white text-sm truncate">
+                                                                {comment.user?.name}
+                                                            </h4>
+                                                            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-tighter">
+                                                                {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed break-words">
+                                                            {comment.content}
+                                                        </p>
+                                                        <div className="flex items-center gap-6 mt-3">
+                                                            <button
+                                                                onClick={() => handleLikeComment(comment.id)}
+                                                                className={`flex items-center gap-1.5 text-xs font-bold transition-all ${isLikedByMe
+                                                                    ? 'text-blue-600 dark:text-blue-400'
+                                                                    : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                                                                    }`}
+                                                            >
+                                                                <div className={`p-1.5 rounded-full transition-colors ${isLikedByMe
+                                                                    ? 'bg-blue-100 dark:bg-blue-900/30'
+                                                                    : 'bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 dark:group-hover:bg-slate-700'
+                                                                    }`}>
+                                                                    {isLikedByMe ? <AiFillLike size={14} /> : <AiOutlineLike size={14} />}
+                                                                </div>
+                                                                {comment.likeCount || 0}
+                                                            </button>
+                                                            <button className="text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                                                Reply
+                                                            </button>
                                                             {currentUser && currentUser.id === comment.userId && (
                                                                 <button
                                                                     onClick={() => handleDeleteComment(comment.id)}
-                                                                    className="text-red-500 hover:text-red-700 text-sm font-bold"
+                                                                    className="text-xs font-bold text-red-500/70 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
                                                                 >
                                                                     Delete
                                                                 </button>
                                                             )}
                                                         </div>
-                                                        <p className="text-slate-700 dark:text-slate-300">{comment.content}</p>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))
+                                            );
+                                        })
                                     )}
                                 </div>
                             </div>

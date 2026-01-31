@@ -11,15 +11,45 @@ import {
     FaArrowLeft,
     FaLightbulb,
     FaCloudUploadAlt,
-    FaTimes
+    FaTimes,
+    FaChevronDown
 } from 'react-icons/fa';
 
 const PostIdea = () => {
-    const [formData, setFormData] = useState({ title: '', content: '', image: '', viewStatus: 'PUBLIC' });
+    const [formData, setFormData] = useState({ title: '', content: '', image: '', viewStatus: 'PUBLIC', teamId: '' });
+    const [teams, setTeams] = useState([]);
+    const [fetchingTeams, setFetchingTeams] = useState(false);
     const [loading, setLoading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
+
+    React.useEffect(() => {
+        const fetchTeams = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            setFetchingTeams(true);
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/my-teams`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                // Combine created and member teams
+                const allTeams = [
+                    ...(res.data.createdTeams || []),
+                    ...(res.data.memberTeams || [])
+                ];
+                // Remove duplicates if any
+                const uniqueTeams = Array.from(new Map(allTeams.map(t => [t.id, t])).values());
+                setTeams(uniqueTeams);
+            } catch (err) {
+                console.error("Error fetching teams:", err);
+            } finally {
+                setFetchingTeams(false);
+            }
+        };
+        fetchTeams();
+    }, []);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -86,7 +116,8 @@ const PostIdea = () => {
 
             await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts`, {
                 ...formData,
-                authorId: userId
+                authorId: userId,
+                teamId: formData.viewStatus === 'TEAM' ? formData.teamId : null
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -258,6 +289,46 @@ const PostIdea = () => {
                                     );
                                 })}
                             </div>
+
+                            {/* Team Selection Dropdown - Only show if TEAM viewStatus is selected */}
+                            {formData.viewStatus === 'TEAM' && (
+                                <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
+                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
+                                        Select Team
+                                    </label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <FaUsers className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                        </div>
+                                        <select
+                                            name="teamId"
+                                            value={formData.teamId}
+                                            onChange={handleChange}
+                                            required={formData.viewStatus === 'TEAM'}
+                                            className="w-full pl-11 pr-10 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all appearance-none text-slate-900 dark:text-white font-medium cursor-pointer"
+                                        >
+                                            <option value="" disabled>Choose a team...</option>
+                                            {teams.length > 0 ? (
+                                                teams.map(team => (
+                                                    <option key={team.id} value={team.id}>
+                                                        {team.name}
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="" disabled>No teams found</option>
+                                            )}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                                            <FaChevronDown className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                        </div>
+                                    </div>
+                                    {teams.length === 0 && !fetchingTeams && (
+                                        <p className="text-xs text-amber-600 dark:text-amber-400 ml-1">
+                                            You are not a member of any teams yet.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
 

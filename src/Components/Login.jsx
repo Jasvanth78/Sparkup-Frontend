@@ -30,6 +30,7 @@ export default function Login() {
         try {
             const response = await axios.post(api, { email, password })
             savedToken(response.data.token)
+            localStorage.setItem("user", JSON.stringify(response.data.user))
             localStorage.setItem("role", isAdmin ? "ADMIN" : "USER")
             toast.success("Login successful")
 

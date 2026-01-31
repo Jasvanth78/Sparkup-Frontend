@@ -1,5 +1,5 @@
-import React from "react";
-import { FiMail, FiMessageSquare, FiHeadphones, FiExternalLink, FiClock, FiBookOpen } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiMail, FiMessageSquare, FiHeadphones, FiExternalLink, FiClock, FiBookOpen, FiX } from "react-icons/fi";
 import Navbar from "./navbar";
 import { CiClock1 } from "react-icons/ci";
 
@@ -48,6 +48,52 @@ const faqs = [
 ];
 
 const Support = () => {
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      author: "John Doe",
+      avatar: "JD",
+      timestamp: "2 hours ago",
+      text: "Great support resources! Really helped me get started.",
+      likes: 5
+    },
+    {
+      id: 2,
+      author: "Sarah Johnson",
+      avatar: "SJ",
+      timestamp: "1 day ago",
+      text: "The email support team was super helpful with my issue.",
+      likes: 3
+    },
+    {
+      id: 3,
+      author: "Mike Chen",
+      avatar: "MC",
+      timestamp: "3 days ago",
+      text: "Quick response time, very impressed with the service!",
+      likes: 8
+    }
+  ]);
+
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [commentText, setCommentText] = useState("");
+
+  const handleAddComment = () => {
+    if (commentText.trim()) {
+      const newComment = {
+        id: comments.length + 1,
+        author: "You",
+        avatar: "YO",
+        timestamp: "just now",
+        text: commentText,
+        likes: 0
+      };
+      setComments([newComment, ...comments]);
+      setCommentText("");
+      setShowCommentModal(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       <Navbar />
@@ -168,8 +214,103 @@ const Support = () => {
           </div>
         </section>
       </main>
+
+      {/* Comments Section */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-slate-200 dark:border-slate-800">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+            <FiMessageSquare className="w-6 h-6 text-blue-600" />
+            Comments
+          </h2>
+
+          {/* Comments List */}
+          <div className="space-y-4 mb-8">
+            {comments.map((comment) => (
+              <div key={comment.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition-shadow">
+                <div className="flex gap-4">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
+                      {comment.avatar}
+                    </div>
+                  </div>
+                  
+                  {/* Comment Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-slate-900 dark:text-white">{comment.author}</span>
+                      <span className="text-sm text-slate-500 dark:text-slate-400">{comment.timestamp}</span>
+                    </div>
+                    <p className="text-slate-700 dark:text-slate-300 mb-3">{comment.text}</p>
+                    <button className="text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-colors">
+                      👍 {comment.likes > 0 && comment.likes}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Comment Button */}
+          <button
+            onClick={() => setShowCommentModal(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+          >
+            <FiMessageSquare className="w-5 h-5" />
+            Add Your Comment
+          </button>
+        </div>
+      </section>
+
+      {/* Comment Modal */}
+      {showCommentModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">Add a Comment</h3>
+              <button
+                onClick={() => {
+                  setShowCommentModal(false);
+                  setCommentText("");
+                }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+              >
+                <FiX className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Share your thoughts or feedback about our support..."
+                className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-none"
+                rows="4"
+              />
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => {
+                    setShowCommentModal(false);
+                    setCommentText("");
+                  }}
+                  className="px-6 py-2 rounded-lg text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddComment}
+                  disabled={!commentText.trim()}
+                  className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Post
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default Support;

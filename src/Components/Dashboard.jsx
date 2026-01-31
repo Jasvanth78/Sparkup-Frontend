@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Navbar from './navbar';
+import authorPlaceholder from '../assets/author.webp';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({ likesRecived: 0, commentsMade: 0, postsAuthored: 0 });
@@ -90,7 +91,7 @@ const Dashboard = () => {
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Profile Summary</h2>
                         <div className="flex items-center gap-6 mb-8">
                             <img
-                                src={user?.image || 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80'}
+                                src={user?.image || authorPlaceholder}
                                 alt="Profile"
                                 className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 dark:border-slate-800 shadow-sm"
                             />

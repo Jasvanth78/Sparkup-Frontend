@@ -172,29 +172,29 @@ const Teams = () => {
             <Navbar />
 
             <div className="flex-1 flex overflow-hidden relative ">
-                
+
                 <div className="absolute top-[-10%] left-[-10%] w-[20%] h-[80%] bg-blue-500/10 blur-[120px] rounded-full"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[40%] bg-purple-500/10 blur-[120px] rounded-full"></div>
 
-                
-                <nav className="w-24 md:w-32 flex flex-col items-center py-20 gap-6 z-20 border-r border-slate-200/50 dark:border-slate-800/50 bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl ">
+
+                <nav className="w-20 sm:w-24 md:w-32 flex flex-col items-center py-12 sm:py-16 md:py-20 gap-4 sm:gap-6 z-20 border-r border-slate-200/50 dark:border-slate-800/50 bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl ">
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="w-12 h-12 md:w-16 md:h-16 rounded-3xl bg-white dark:bg-slate-800 shadow-lg shadow-blue-500/10 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform active:scale-95"
+                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800 shadow-lg shadow-blue-500/10 flex items-center justify-center text-blue-600 hover:scale-110 transition-transform active:scale-95"
                     >
-                        <FaPlus size={20} />
+                        <FaPlus size={16} className="sm:w-5 sm:h-5" />
                     </button>
 
-                    <div className="w-12 md:w-16 h-[2px] bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+                    <div className="w-10 sm:w-12 md:w-16 h-[2px] bg-slate-200 dark:bg-slate-800 rounded-full"></div>
 
-                    <div className="flex-1 flex flex-col gap-6 overflow-y-auto no-scrollbar scroll-smooth  ">
+                    <div className="flex-1 flex flex-col gap-3 sm:gap-4 md:gap-6 overflow-y-auto no-scrollbar scroll-smooth">
                         {teams.map(team => (
                             <div key={team.id} className="relative group">
-                                {/* <button
+                                <button
                                     onClick={() => setActiveTeam(team)}
-                                    className={`w-12 h-12 md:w-10 md:h-10 rounded-full overflow-hidden transition-all duration-300 relative ${activeTeam?.id === team.id ? 'scale-110 rounded-[1.2rem] shadow-2xl shadow-blue-500/20' : 'hover:rounded-[1.2rem]'}`}
+                                    className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full overflow-hidden transition-all duration-300 relative ${activeTeam?.id === team.id ? 'scale-110 rounded-[1.2rem] shadow-2xl shadow-blue-500/20' : 'hover:rounded-[1.2rem]'}`}
                                 >
-                                    <div className={`absolute inset-0 bg-gradient-to-br ${activeTeam?.id === team.id ? 'from-blue-600 to-indigo-700' : 'from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800'} flex items-center justify-center text-white font-bold text-sm `}>
+                                    <div className={`absolute inset-0 bg-gradient-to-br ${activeTeam?.id === team.id ? 'from-blue-600 to-indigo-700' : 'from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800'} flex items-center justify-center text-white font-bold text-xs sm:text-sm`}>
                                         {team.name[0]}
                                     </div>
                                     <img
@@ -202,12 +202,12 @@ const Teams = () => {
                                         className={`w-full h-full object-cover transition-opacity duration-300 ${activeTeam?.id === team.id ? 'opacity-0' : 'opacity-100 group-hover:opacity-0'}`}
                                         alt=""
                                     />
-                                </button> */}
+                                </button>
                                 {activeTeam?.id === team.id && (
-                                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-8 bg-blue-600 rounded-r-full animate-in slide-in-from-left-full"></div>
+                                    <div className="absolute -left-1 top-1/2 -translate-y-1/2 w-1.5 sm:w-2 h-6 sm:h-8 bg-blue-600 rounded-r-full animate-in slide-in-from-left-full"></div>
                                 )}
-                                
-                                <div className="absolute left-full ml-4 px-3 py-1 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
+
+                                <div className="absolute left-full ml-2 sm:ml-4 px-2 sm:px-3 py-1 bg-slate-900 text-white text-[10px] sm:text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">
                                     {team.name}
                                 </div>
                             </div>
@@ -215,38 +215,43 @@ const Teams = () => {
                     </div>
                 </nav>
 
-                
-                <main className="flex-1 flex flex-col p-4 md:p-8 overflow-hidden z-10 mt-2 h-screen">
+
+                <main className="flex-1 flex flex-col p-2 sm:p-4 md:p-8 overflow-hidden z-10">
                     {activeTeam ? (
                         <div className="flex-1 flex flex-col bg-white/40 dark:bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-white/40 dark:border-slate-800/40 shadow-2xl shadow-slate-200/50 dark:shadow-none overflow-hidden animate-in fade-in zoom-in-95 duration-500">
 
-                           
-                            <header className="p-8 md:px-12 md:py-10 border-b border-slate-200/30 dark:border-slate-800/30 flex items-center justify-between">
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-3">
-                                        <h2 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">{activeTeam.name}</h2>
+
+                            <header className="p-4 sm:p-6 md:p-8 md:px-12 md:py-10 border-b border-slate-200/30 dark:border-slate-800/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div className="space-y-1 flex-1">
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                        <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight">{activeTeam.name}</h2>
                                         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                                     </div>
-                                    <p className="text-sm font-medium text-slate-400 leading-relaxed max-w-lg truncate">{activeTeam.description || "Building the future of innovation."}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-slate-400 leading-relaxed max-w-lg truncate">{activeTeam.description || "Building the future of innovation."}</p>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="flex -space-x-3 hover:space-x-1 transition-all">
-                                        {activeTeam.members?.slice(0, 4).map((m, i) => (
-                                            <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 shadow-lg overflow-hidden cursor-help" title={m.user.name}>
+                                <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                                    <div className="flex -space-x-2 sm:-space-x-3 hover:space-x-0.5 sm:hover:space-x-1 transition-all">
+                                        {activeTeam.members?.slice(0, 3).map((m, i) => (
+                                            <div key={i} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 shadow-lg overflow-hidden cursor-help" title={m.user.name}>
                                                 <img src={`https://ui-avatars.com/api/?name=${m.user.name}&background=random`} alt="" />
                                             </div>
                                         ))}
+                                        {activeTeam.members?.length > 3 && (
+                                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-700 shadow-lg flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                +{activeTeam.members.length - 3}
+                                            </div>
+                                        )}
                                     </div>
                                     <button
                                         onClick={() => setShowManageModal(true)}
-                                        className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-700 transition-all flex items-center justify-center"
+                                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-blue-600 hover:bg-white dark:hover:bg-slate-700 transition-all flex items-center justify-center"
                                     >
-                                        <FaInfoCircle size={20} />
+                                        <FaInfoCircle size={18} className="sm:w-5 sm:h-5" />
                                     </button>
                                 </div>
                             </header>
 
-                            
+
                             <div className="flex-1 overflow-y-auto px-4 py-10 space-y-8 custom-scrollbar scroll-smooth">
                                 {messages.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-40">
@@ -286,21 +291,21 @@ const Teams = () => {
                                 <div ref={chatEndRef} />
                             </div>
 
-                            
-                            <div className="p-8 bg-white/50 dark:bg-slate-900/50 border-t border-slate-200/30 dark:border-slate-800/30">
-                                <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-4">
+
+                            <div className="p-3 sm:p-4 md:p-6 lg:p-8 bg-white/50 dark:bg-slate-900/50 border-t border-slate-200/30 dark:border-slate-800/30">
+                                <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-2 sm:gap-3 md:gap-4">
                                     <div className="flex-1 relative group">
                                         <input
                                             type="text"
                                             value={newMessage}
                                             onChange={(e) => setNewMessage(e.target.value)}
-                                            placeholder="Write an update, share a thought..."
-                                            className="w-full bg-white dark:bg-slate-800 border-none rounded-[2rem] px-8 py-5 text-slate-800 dark:text-white shadow-xl shadow-slate-200/20 dark:shadow-none focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
+                                            placeholder="Write an update..."
+                                            className="w-full bg-white dark:bg-slate-800 border-none rounded-full sm:rounded-[2rem] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 text-sm sm:text-base text-slate-800 dark:text-white shadow-xl shadow-slate-200/20 dark:shadow-none focus:ring-2 focus:ring-blue-500/10 transition-all outline-none"
                                         />
-                                        <FaSearch className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={14} />
+                                        <FaSearch className="hidden sm:block absolute right-6 md:right-8 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-blue-500 transition-colors" size={14} />
                                     </div>
-                                    <button className="w-16 h-16 rounded-[2rem] bg-blue-600 text-white shadow-xl shadow-blue-500/40 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center shrink-0">
-                                        <FaPaperPlane size={20} />
+                                    <button className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full sm:rounded-[2rem] bg-blue-600 text-white shadow-xl shadow-blue-500/40 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all flex items-center justify-center shrink-0">
+                                        <FaPaperPlane size={16} className="sm:w-5 sm:h-5" />
                                     </button>
                                 </form>
                             </div>
@@ -326,7 +331,7 @@ const Teams = () => {
                 </main>
             </div>
 
-      
+
             {/* {activeTeam && (
                 // <button
                 //     onClick={() => { }}
@@ -336,20 +341,20 @@ const Teams = () => {
                 // </button>
             )} */}
 
-         
+
             {showCreateModal && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[3rem] p-10 shadow-2xl">
-                        <div className="flex justify-between items-center mb-10">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl sm:rounded-[3rem] p-6 sm:p-8 md:p-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-6 sm:mb-8 md:mb-10">
                             <div>
-                                <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">New Pod</h3>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Initialize Collaboration</p>
+                                <h3 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">New Pod</h3>
+                                <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Initialize Collaboration</p>
                             </div>
-                            <button onClick={() => setShowCreateModal(false)} className="w-10 h-10 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors">
-                                <FaTimes />
+                            <button onClick={() => setShowCreateModal(false)} className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors">
+                                <FaTimes size={16} className="sm:w-5 sm:h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleCreateTeam} className="space-y-8">
+                        <form onSubmit={handleCreateTeam} className="space-y-6 sm:space-y-8">
                             <div className="space-y-3">
                                 <label className="text-sm font-bold text-slate-400 px-2 uppercase tracking-widest">Workspace Name</label>
                                 <input
@@ -376,24 +381,24 @@ const Teams = () => {
                 </div>
             )}
 
-          
+
             {showManageModal && activeTeam && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-[3.5rem] p-12 shadow-2xl flex flex-col max-h-[90vh]">
-                        <div className="flex justify-between items-center mb-10">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-3xl sm:rounded-[3.5rem] p-6 sm:p-8 md:p-12 shadow-2xl flex flex-col max-h-[90vh]">
+                        <div className="flex justify-between items-center mb-6 sm:mb-8 md:mb-10">
                             <div>
-                                <h3 className="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Hub Controls</h3>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manage active participants & visibility</p>
+                                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight">Hub Controls</h3>
+                                <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manage participants</p>
                             </div>
-                            <button onClick={() => setShowManageModal(false)} className="w-12 h-12 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors">
-                                <FaTimes size={24} />
+                            <button onClick={() => setShowManageModal(false)} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl sm:rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors">
+                                <FaTimes size={20} className="sm:w-6 sm:h-6" />
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar">
-                            <section className="space-y-6">
-                                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-2">Invite Participants</h4>
-                                <div className="flex gap-4">
+                        <div className="flex-1 overflow-y-auto space-y-8 sm:space-y-12 pr-2 sm:pr-4 custom-scrollbar">
+                            <section className="space-y-4 sm:space-y-6">
+                                <h4 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest px-2">Invite Participants</h4>
+                                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                                     <input
                                         type="text"
                                         value={searchUser}
@@ -404,7 +409,7 @@ const Teams = () => {
                                         className="flex-1 bg-slate-50 dark:bg-slate-800/50 border-none rounded-2xl px-6 py-5 outline-none focus:ring-2 focus:ring-blue-500/10"
                                         placeholder="Search by name or email..."
                                     />
-                                    <button onClick={handleSearchUsers} className="px-8 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all">Search</button>
+                                    <button onClick={handleSearchUsers} className="px-6 sm:px-8 py-4 sm:py-auto bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-all whitespace-nowrap">Search</button>
                                 </div>
                                 {foundUsers.map(user => (
                                     <div key={user.id} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl flex items-center justify-between animate-in slide-in-from-top-2">
@@ -420,9 +425,9 @@ const Teams = () => {
                                 ))}
                             </section>
 
-                            <section className="space-y-6">
-                                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest px-2">Active Core ({activeTeam.members?.length})</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <section className="space-y-4 sm:space-y-6">
+                                <h4 className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest px-2">Active Core ({activeTeam.members?.length})</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     {activeTeam.members?.map(m => (
                                         <div key={m.userId} className="p-5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-3xl flex items-center justify-between group">
                                             <div className="flex items-center gap-4">
@@ -443,13 +448,13 @@ const Teams = () => {
                             </section>
                         </div>
 
-                        <div className="pt-8 mt-10 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <div className="pt-6 sm:pt-8 mt-6 sm:mt-10 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between items-stretch sm:items-center">
                             {activeTeam.creatorId === currentUser.id ? (
-                                <button onClick={handleDeleteTeam} className="text-red-500 font-bold hover:underline">Self-Destruct Workspace</button>
+                                <button onClick={handleDeleteTeam} className="text-red-500 text-sm sm:text-base font-bold hover:underline order-2 sm:order-1">Self-Destruct Workspace</button>
                             ) : (
-                                <button className="text-slate-400 font-bold hover:text-slate-600 flex items-center gap-2"><FaSignOutAlt /> Abandon Pod</button>
+                                <button className="text-slate-400 text-sm sm:text-base font-bold hover:text-slate-600 flex items-center justify-center sm:justify-start gap-2 order-2 sm:order-1"><FaSignOutAlt /> Abandon Pod</button>
                             )}
-                            <button onClick={() => setShowManageModal(false)} className="px-10 py-4 bg-slate-900 text-white font-bold rounded-2xl">Return to Hub</button>
+                            <button onClick={() => setShowManageModal(false)} className="px-6 sm:px-10 py-3 sm:py-4 bg-slate-900 text-white font-bold rounded-2xl order-1 sm:order-2">Return to Hub</button>
                         </div>
                     </div>
                 </div>

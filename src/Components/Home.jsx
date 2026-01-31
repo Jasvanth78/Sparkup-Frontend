@@ -15,7 +15,9 @@ export default function Home() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await axios.get(API_URL)
+        const token = localStorage.getItem('token');
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const response = await axios.get(API_URL, config)
         setPosts(response.data)
       } catch (error) {
         console.error("Error fetching posts:", error)

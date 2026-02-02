@@ -3,21 +3,72 @@ import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { FaBell, FaCheck, FaTrash, FaCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { io } from 'socket.io-client';
 
 const Notification = () => {
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // 'all', 'unread'
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decoded = parseJwt(token);
+            setUserId(decoded.id);
+        }
         fetchNotifications();
     }, []);
+
+    useEffect(() => {
+        if (!userId) return;
+
+        // Initialize Socket.IO connection for real-time notifications
+        const socket = io(import.meta.env.VITE_API_BASE_URL, {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 5
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to notification socket');
+            socket.emit('joinNotifications', userId);
+        });
+
+        // Listen for new notifications
+        socket.on('newNotification', (notification) => {
+            setNotifications(prev => [notification, ...prev]);
+        });
+
+        // Listen for notification read events
+        socket.on('notificationRead', (data) => {
+            setNotifications(prev => 
+                prev.map(n => n.id === data.notificationId ? { ...n, isRead: true } : n)
+            );
+        });
+
+        // Listen for all notifications read event
+        socket.on('allNotificationsRead', (data) => {
+            if (data.userId === userId) {
+                setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+            }
+        });
+
+        return () => {
+            socket.off('newNotification');
+            socket.off('notificationRead');
+            socket.off('allNotificationsRead');
+            socket.disconnect();
+        };
+    }, [userId]);
 
     const fetchNotifications = async () => {
         try {
             const token = localStorage.getItem('token');
-            const userId = parseJwt(token).id;
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/notifications/${userId}`, {
+            const decoded = parseJwt(token);
+            const fetchUserId = decoded.id;
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/notifications/${fetchUserId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(response.data);

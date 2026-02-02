@@ -4,6 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { FaPlus, FaBell } from "react-icons/fa";
 import { useTheme } from "../Context/ThemeContext";
 import authorPlaceholder from "../assets/author.webp";
+import { io } from "socket.io-client";
+import { toast } from "react-toastify";
 
 const ProfileMenu = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -187,6 +189,47 @@ const Navbar = () => {
     };
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const socket = io(import.meta.env.VITE_API_BASE_URL, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected to notification socket in Navbar');
+      socket.emit('joinNotifications', user.id);
+    });
+
+    socket.on('newNotification', (notification) => {
+      setUnreadCount(prev => prev + 1);
+      toast.info(notification.content, {
+        onClick: () => navigate('/Notifications'),
+        className: 'dark:bg-slate-900 dark:text-white border border-gray-100 dark:border-slate-800 rounded-xl shadow-lg',
+      });
+    });
+
+    socket.on('notificationRead', () => {
+      // Re-fetch count to be accurate
+      const token = localStorage.getItem('token');
+      if (token) fetchUnreadCount(token);
+    });
+
+    socket.on('allNotificationsRead', () => {
+      setUnreadCount(0);
+    });
+
+    return () => {
+      socket.off('newNotification');
+      socket.off('notificationRead');
+      socket.off('allNotificationsRead');
+      socket.disconnect();
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     const handleResize = () => {

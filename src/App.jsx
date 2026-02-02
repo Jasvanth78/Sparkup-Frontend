@@ -13,6 +13,9 @@ import Register from './Components/Register'
 import Support from './Components/Support'
 import ProtectedRoute from './Components/ProtectedRoute'
 import Notification from './Components/Notification'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
   return (
@@ -31,9 +34,9 @@ function App() {
           <Route path="/Teams" element={<Teams />} />
           <Route path="/Passwordreset" element={<Passwordreset />} />
           <Route path="/Support" element={<Support />} />
-
         </Routes>
       </Router>
+      <ToastContainer position="bottom-right" theme="colored" />
     </div>
   )
 }

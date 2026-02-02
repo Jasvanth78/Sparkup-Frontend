@@ -22,7 +22,7 @@ const supportChannels = [
     title: "Book a call",
     description: "Schedule a 15-minute call to troubleshoot together or walk through a feature.",
     action: "Pick a time",
-    href: "https://cal.com/", // Placeholder; replace with your scheduling link
+    href: "https://cal.com/", 
     icon: <FiHeadphones className="w-5 h-5" />,
   },
 ];
@@ -215,7 +215,7 @@ const Support = () => {
         </section>
       </main>
 
-      {/* Comments Section */}
+     
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-slate-200 dark:border-slate-800">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -223,19 +223,17 @@ const Support = () => {
             Comments
           </h2>
 
-          {/* Comments List */}
           <div className="space-y-4 mb-8">
             {comments.map((comment) => (
               <div key={comment.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition-shadow">
                 <div className="flex gap-4">
-                  {/* Avatar */}
+                  
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
                       {comment.avatar}
                     </div>
                   </div>
                   
-                  {/* Comment Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-slate-900 dark:text-white">{comment.author}</span>
@@ -251,7 +249,6 @@ const Support = () => {
             ))}
           </div>
 
-          {/* Add Comment Button */}
           <button
             onClick={() => setShowCommentModal(true)}
             className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
@@ -262,7 +259,6 @@ const Support = () => {
         </div>
       </section>
 
-      {/* Comment Modal */}
       {showCommentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-800">

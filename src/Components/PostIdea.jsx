@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fa';
 
 const PostIdea = () => {
-    const [formData, setFormData] = useState({ title: '', content: '', image: '', viewStatus: 'PUBLIC', teamId: '' });
+    const [formData, setFormData] = useState({ title: '', content: '', image: '', viewStatus: 'PUBLIC', teamIds: [] });
     const [teams, setTeams] = useState([]);
     const [fetchingTeams, setFetchingTeams] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -105,6 +105,13 @@ const PostIdea = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate team selection if TEAM view status is selected
+        if (formData.viewStatus === 'TEAM' && formData.teamIds.length === 0) {
+            toast.error('Please select at least one team');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -117,7 +124,7 @@ const PostIdea = () => {
             await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts`, {
                 ...formData,
                 authorId: userId,
-                teamId: formData.viewStatus === 'TEAM' ? formData.teamId : null
+                teamIds: formData.viewStatus === 'TEAM' ? formData.teamIds : []
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -294,33 +301,60 @@ const PostIdea = () => {
                             {formData.viewStatus === 'TEAM' && (
                                 <div className="mt-4 space-y-3 animate-in fade-in slide-in-from-top-4 duration-300">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
-                                        Select Team
+                                        Select Teams (Multiple)
                                     </label>
-                                    <div className="relative group">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <FaUsers className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                        </div>
-                                        <select
-                                            name="teamId"
-                                            value={formData.teamId}
-                                            onChange={handleChange}
-                                            required={formData.viewStatus === 'TEAM'}
-                                            className="w-full pl-11 pr-10 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all appearance-none text-slate-900 dark:text-white font-medium cursor-pointer"
-                                        >
-                                            <option value="" disabled>Choose a team...</option>
+                                    <div className="space-y-3">
+                                        <div className="max-h-60 overflow-y-auto space-y-2 p-2 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700">
                                             {teams.length > 0 ? (
                                                 teams.map(team => (
-                                                    <option key={team.id} value={team.id}>
-                                                        {team.name}
-                                                    </option>
+                                                    <label
+                                                        key={team.id}
+                                                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2 ${
+                                                            formData.teamIds.includes(team.id)
+                                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                                : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={formData.teamIds.includes(team.id)}
+                                                            onChange={(e) => {
+                                                                const newTeamIds = e.target.checked
+                                                                    ? [...formData.teamIds, team.id]
+                                                                    : formData.teamIds.filter(id => id !== team.id);
+                                                                setFormData({ ...formData, teamIds: newTeamIds });
+                                                            }}
+                                                            className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                                                        />
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2">
+                                                                <FaUsers className="text-blue-500 text-sm" />
+                                                                <span className="font-semibold text-slate-900 dark:text-white">
+                                                                    {team.name}
+                                                                </span>
+                                                            </div>
+                                                            {team.description && (
+                                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 ml-6">
+                                                                    {team.description}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    </label>
                                                 ))
                                             ) : (
-                                                <option value="" disabled>No teams found</option>
+                                                <p className="text-slate-500 dark:text-slate-400 text-center py-4">
+                                                    No teams found
+                                                </p>
                                             )}
-                                        </select>
-                                        <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                                            <FaChevronDown className="text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                         </div>
+                                        {formData.teamIds.length > 0 && (
+                                            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 ml-1">
+                                                <FaUsers />
+                                                <span className="font-medium">
+                                                    {formData.teamIds.length} team{formData.teamIds.length > 1 ? 's' : ''} selected
+                                                </span>
+                                            </div>
+                                        )}
                                     </div>
                                     {teams.length === 0 && !fetchingTeams && (
                                         <p className="text-xs text-amber-600 dark:text-amber-400 ml-1">

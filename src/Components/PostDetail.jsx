@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { AiFillLike, AiOutlineLike } from 'react-icons/ai';
 import { formatDistanceToNow } from 'date-fns';
+import { io } from 'socket.io-client';
 import Navbar from './navbar';
 import authorPlaceholder from '../assets/author.webp';
 const postPlaceholder = "https://images.unsplash.com/photo-1519389950473-acc799a6d401?ixlib=rb-1.2.1&auto=format&fit=crop&w=1480&q=80";
@@ -79,6 +80,38 @@ const PostDetail = () => {
             }
         };
         fetchPost();
+
+        // Socket.IO setup for real-time updates
+        const socket = io(import.meta.env.VITE_API_BASE_URL, {
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 5
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to socket server');
+            socket.emit('joinPost', id);
+        });
+
+        // Listen for real-time like updates
+        socket.on('postLiked', (data) => {
+            if (data.postId === id) {
+                setLikeCount(data.likeCount || 0);
+            }
+        });
+
+        // Listen for new comments
+        socket.on('newComment', (comment) => {
+            setComments(prevComments => [comment, ...prevComments]);
+            setCommentCount(prevCount => prevCount + 1);
+        });
+
+        return () => {
+            socket.off('postLiked');
+            socket.off('newComment');
+            socket.disconnect();
+        };
     }, [id, navigate, currentUser]);
 
     const handleLike = async () => {
@@ -92,11 +125,9 @@ const PostDetail = () => {
                 userId: currentUser.id
             });
 
+            // Update both liked status and like count from response
             setLiked(response.data.liked);
-
-            // Refresh like count
-            const likeCountRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/likes/count`);
-            setLikeCount(likeCountRes.data.count);
+            setLikeCount(response.data.likeCount || 0);
 
             toast.success(response.data.liked ? 'Post liked!' : 'Post unliked');
         } catch (error) {
@@ -228,24 +259,30 @@ const PostDetail = () => {
                             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 order-1">
                                 <button
                                     onClick={handleLike}
-                                    className={`flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-colors border ${liked
-                                        ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-900/50'
-                                        : 'bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 hover:bg-pink-100 dark:hover:bg-pink-900/40 border-transparent dark:border-pink-900/30'
+                                    className={`flex items-center justify-center gap-3 px-8 py-3 rounded-2xl font-bold transition-all duration-200 border-2 transform hover:scale-105 active:scale-95 ${liked
+                                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white border-pink-600 shadow-lg shadow-pink-500/30'
+                                        : 'bg-white dark:bg-slate-900 text-pink-600 dark:text-pink-400 border-pink-200 dark:border-pink-900/50 hover:border-pink-300 dark:hover:border-pink-900'
                                         }`}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill={liked ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill={liked ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={`w-6 h-6 transition-all ${liked ? 'animate-pulse' : ''}`}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                                     </svg>
-                                    {liked ? 'Liked' : 'Support Idea'} ({likeCount})
+                                    <span className="text-lg">{liked ? 'Liked' : 'Support Idea'}</span>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${liked ? 'bg-white/30' : 'bg-pink-100 dark:bg-pink-900/40'}`}>
+                                        {likeCount}
+                                    </span>
                                 </button>
                                 <button
                                     onClick={() => setShowComments(!showComments)}
-                                    className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-transparent dark:border-blue-900/30"
+                                    className="flex items-center justify-center gap-3 px-8 py-3 bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 rounded-2xl font-bold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 border-2 border-blue-200 dark:border-blue-900/50 transform hover:scale-105 active:scale-95"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                                     </svg>
-                                    {showComments ? 'Hide Comments' : (commentCount === 0 ? 'Be the first to comment' : `Show Comments (${commentCount})`)}
+                                    <span className="text-lg">{showComments ? 'Hide Comments' : 'Comments'}</span>
+                                    <span className="px-3 py-1 rounded-full text-sm font-bold bg-blue-100 dark:bg-blue-900/40">
+                                        {commentCount}
+                                    </span>
                                 </button>
                             </div>
                             <button

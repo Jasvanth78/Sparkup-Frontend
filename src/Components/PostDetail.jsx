@@ -120,17 +120,25 @@ const PostDetail = () => {
             return;
         }
 
+        // Optimistic Update
+        const prevLiked = liked;
+        const prevLikeCount = likeCount;
+
+        setLiked(!prevLiked);
+        setLikeCount(prevLiked ? prevLikeCount - 1 : prevLikeCount + 1);
+
         try {
             const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/like`, {
                 userId: currentUser.id
             });
 
-            // Update both liked status and like count from response
+            // Sync with server response
             setLiked(response.data.liked);
             setLikeCount(response.data.likeCount || 0);
-
-            toast.success(response.data.liked ? 'Post liked!' : 'Post unliked');
         } catch (error) {
+            // Revert on error
+            setLiked(prevLiked);
+            setLikeCount(prevLikeCount);
             toast.error('Failed to update like');
         }
     };
@@ -192,16 +200,31 @@ const PostDetail = () => {
             return;
         }
 
+        // Optimistic Update
+        const previousComments = [...comments];
+        setComments(prevComments => prevComments.map(comment => {
+            if (comment.id === commentId) {
+                const isLiked = comment.commentlikes?.some(like => like.userId === currentUser.id);
+                const newLikes = isLiked
+                    ? comment.commentlikes.filter(like => like.userId !== currentUser.id)
+                    : [...(comment.commentlikes || []), { userId: currentUser.id }];
+
+                return {
+                    ...comment,
+                    commentlikes: newLikes,
+                    likeCount: isLiked ? (comment.likeCount || 1) - 1 : (comment.likeCount || 0) + 1
+                };
+            }
+            return comment;
+        }));
+
         try {
             await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/comment/${commentId}/like`, {
                 userId: currentUser.id
             });
-
-            // Refresh comments to get new counts and like status
-            const commentsRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/posts/${id}/comments`);
-            setComments(commentsRes.data);
         } catch (error) {
             console.error('Error liking comment:', error);
+            setComments(previousComments); // Revert on failure
             toast.error('Failed to like comment');
         }
     };

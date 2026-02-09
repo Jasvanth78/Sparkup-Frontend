@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api/config';
 import Navbar from './navbar';
+
 import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
@@ -33,7 +35,8 @@ const AdminDashboard = () => {
             }
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const baseUrl = `${import.meta.env.VITE_API_BASE_URL}api/admin`;
+            const baseUrl = `${API_BASE_URL}/api/admin`;
+
 
             // Fetch all data in parallel
             const [usersRes, postsRes] = await Promise.all([
@@ -56,8 +59,16 @@ const AdminDashboard = () => {
 
             setLoading(false);
         } catch (error) {
-            console.error(error);
-            toast.error('Failed to fetch admin data');
+            console.error('Admin Dashboard fetch error:', error);
+            const errorMessage = error.response?.data?.error || error.response?.data?.details || 'Failed to fetch admin data';
+            toast.error(errorMessage);
+
+            if (error.response?.status === 401 || error.response?.status === 404) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.removeItem('role');
+                window.location.href = '/';
+            }
             setLoading(false);
         }
     };
@@ -70,7 +81,8 @@ const AdminDashboard = () => {
         try {
             const token = localStorage.getItem('token');
             const endpoint = action === 'approve' ? 'approveUser' : 'rejectUser';
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/admin/${endpoint}`, { userId }, {
+            await axios.post(`${API_BASE_URL}/api/admin/${endpoint}`, { userId }, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success(`User ${action}d successfully`);
@@ -83,7 +95,8 @@ const AdminDashboard = () => {
     const handlePostAction = async (postId, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}api/admin/posts/${postId}/status`, { status }, {
+            await axios.put(`${API_BASE_URL}/api/admin/posts/${postId}/status`, { status }, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success(`Post ${status.toLowerCase()} successfully`);
@@ -97,7 +110,8 @@ const AdminDashboard = () => {
         if (!window.confirm('Are you sure you want to soft delete this user? They will still be in the database but marked as deleted.')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/admin/softDeleteUser`, { userId }, {
+            await axios.post(`${API_BASE_URL}/api/admin/softDeleteUser`, { userId }, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('User soft deleted');
@@ -111,7 +125,8 @@ const AdminDashboard = () => {
         if (!window.confirm('CRITICAL: Are you sure you want to PERMANENTLY delete this user and all their posts? This cannot be undone.')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}api/admin/hardDeleteUser/${userId}`, {
+            await axios.delete(`${API_BASE_URL}/api/admin/hardDeleteUser/${userId}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('User permanently deleted');
@@ -126,7 +141,8 @@ const AdminDashboard = () => {
     const fetchUserPosts = async (user) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/admin/users/${user.id}/posts`, {
+            const res = await axios.get(`${API_BASE_URL}/api/admin/users/${user.id}/posts`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setSelectedUserPosts(res.data);
@@ -141,7 +157,8 @@ const AdminDashboard = () => {
         if (!window.confirm('Delete this post permanently?')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}api/admin/posts/${postId}`, {
+            await axios.delete(`${API_BASE_URL}/api/admin/posts/${postId}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('Post deleted');
@@ -156,7 +173,8 @@ const AdminDashboard = () => {
     const handleRestore = async (userId) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/admin/restoreUser`, { userId }, {
+            await axios.post(`${API_BASE_URL}/api/admin/restoreUser`, { userId }, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('User restored');
@@ -170,7 +188,8 @@ const AdminDashboard = () => {
         if (!window.confirm('Are you sure you want to promote this user to an ADMIN? They will have full access to this dashboard.')) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/admin/promoteToAdmin`, { userId }, {
+            await axios.post(`${API_BASE_URL}/api/admin/promoteToAdmin`, { userId }, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('User promoted to Admin');

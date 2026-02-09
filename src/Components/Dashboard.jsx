@@ -2,13 +2,22 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api/config';
 import Navbar from './navbar';
+
 import authorPlaceholder from '../assets/author.webp';
+import { RiInstagramFill } from "react-icons/ri";
+import { FaLinkedinIn, FaGithub, FaGlobe } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { IoMailUnread } from "react-icons/io5";
+
 
 const Dashboard = () => {
     const [stats, setStats] = useState({ likesRecived: 0, commentsMade: 0, postsAuthored: 0 });
     const [user, setUser] = useState(null);
+    const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [loadingPosts, setLoadingPosts] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,30 +29,61 @@ const Dashboard = () => {
                 const userEndpoint = role === 'ADMIN' ? 'api/admin/me' : 'api/users/me';
 
                 const [statsRes, userRes] = await Promise.all([
-                    axios.get(`${import.meta.env.VITE_API_BASE_URL}${statsEndpoint}`, {
+                    axios.get(`${API_BASE_URL}/${statsEndpoint}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     }),
-                    axios.get(`${import.meta.env.VITE_API_BASE_URL}${userEndpoint}`, {
+                    axios.get(`${API_BASE_URL}/${userEndpoint}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                 ]);
+
                 setStats(statsRes.data);
                 setUser(userRes.data);
                 setLoading(false);
+
+                // Fetch posts for this user
+                if (userRes.data.id) {
+                    fetchUserPosts(userRes.data.id, token);
+                }
             } catch (error) {
                 console.error('Dashboard fetch error:', error);
-                toast.error('Failed to fetch dashboard data');
+                const errorMessage = error.response?.data?.error || error.response?.data?.details || 'Failed to fetch dashboard data';
+                toast.error(errorMessage);
+
+                if (error.response?.status === 401 || error.response?.status === 404) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('role');
+                    window.location.href = '/';
+                }
                 setLoading(false);
             }
         };
+
+        const fetchUserPosts = async (userId, token) => {
+            setLoadingPosts(true);
+            try {
+                const res = await axios.get(`${API_BASE_URL}/api/users/${userId}/posts`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setPosts(res.data);
+            } catch (error) {
+                console.error('Error fetching user posts:', error);
+            } finally {
+                setLoadingPosts(false);
+            }
+        };
+
         fetchData();
     }, []);
 
-    if (loading) return <div className="flex justify-center items-center h-screen text-slate-900">Loading Dashboard...</div>;
+    if (loading) return <div className="flex justify-center items-center h-screen text-slate-900 px-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+    </div>;
 
     const statCards = [
         {
-            label: 'Likes Recived', value: stats.likesRecived, icon: (
+            label: 'Likes Received', value: stats.likesRecived, icon: (
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-pink-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
                 </svg>
@@ -68,43 +108,73 @@ const Dashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
             <Navbar />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-slate-900 dark:text-white">
                 <div className="mb-10">
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Welcome back, {user?.name}!</h1>
-                    <p className="text-slate-500 dark:text-slate-400 mt-2">Here's an overview of your activity on SparkUp.</p>
+                    <h1 className="text-3xl font-bold">Welcome back, {user?.name}!</h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Here's an overview of your activity on SparkUp.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {statCards.map((card) => (
-                        <div key={card.label} className="bg-white dark:bg-slate-900 p-8 rounded-3xl  border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md hover:-translate-y-1">
+                        <div key={card.label} className="bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md">
                             <div className={`w-12 h-12 ${card.color} dark:bg-opacity-10 rounded-2xl flex items-center justify-center mb-6`}>
                                 {card.icon}
                             </div>
                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{card.label}</p>
-                            <p className="text-4xl font-bold text-slate-900 dark:text-white">{card.value}</p>
+                            <p className="text-4xl font-bold">{card.value}</p>
                         </div>
                     ))}
                 </div>
 
                 <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800">
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Profile Summary</h2>
+                        <h2 className="text-xl font-bold mb-6">Profile Summary</h2>
                         <div className="flex items-center gap-6 mb-8">
                             <img
                                 src={user?.image || authorPlaceholder}
                                 alt="Profile"
-                                className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 dark:border-slate-800 shadow-sm"
+                                className="w-20 h-20 rounded-full object-cover border-4 border-slate-50 dark:border-slate-800 shadow-sm transition-transform hover:scale-105"
                             />
                             <div>
-                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{user?.name}</h3>
-                                <p className="text-slate-500 dark:text-slate-400">{user?.email}</p>
-                                <span className="inline-block mt-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider">
+                                <h3 className="text-lg font-bold">{user?.name}</h3>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm">{user?.email}</p>
+                                <span className="inline-block mt-2 px-3 py-1 bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-full uppercase tracking-wider">
                                     {user?.role}
                                 </span>
+                                <div className="flex gap-3 mt-4">
+                                    {user?.instagram && (
+                                        <a href={user.instagram} target="_blank" rel="noopener noreferrer" className="text-pink-600 dark:text-pink-400 hover:scale-110 transition-transform">
+                                            <RiInstagramFill size={18} />
+                                        </a>
+                                    )}
+                                    {user?.linkedin && (
+                                        <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:scale-110 transition-transform">
+                                            <FaLinkedinIn size={18} />
+                                        </a>
+                                    )}
+                                    {user?.twitter && (
+                                        <a href={user.twitter} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 hover:scale-110 transition-transform">
+                                            <FaXTwitter size={18} />
+                                        </a>
+                                    )}
+                                    {user?.github && (
+                                        <a href={user.github} target="_blank" rel="noopener noreferrer" className="text-slate-900 dark:text-white hover:scale-110 transition-transform">
+                                            <FaGithub size={18} />
+                                        </a>
+                                    )}
+                                    {user?.website && (
+                                        <a href={user.website} target="_blank" rel="noopener noreferrer" className="text-emerald-600 dark:text-emerald-400 hover:scale-110 transition-transform">
+                                            <FaGlobe size={18} />
+                                        </a>
+                                    )}
+                                    <a href={`mailto:${user?.email}`} className="text-orange-600 dark:text-orange-400 hover:scale-110 transition-transform">
+                                        <IoMailUnread size={18} />
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
-                            <Link to="/Settings" className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors">
+                            <Link to="/Settings" className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl font-bold hover:opacity-90 transition-all shadow-sm">
                                 Edit Profile
                             </Link>
                             <button
@@ -112,7 +182,7 @@ const Dashboard = () => {
                                     localStorage.removeItem('token');
                                     window.location.href = '/';
                                 }}
-                                className="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                                className="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-all shadow-sm"
                             >
                                 Sign Out
                             </button>
@@ -120,21 +190,91 @@ const Dashboard = () => {
                     </div>
 
                     <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-                        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+                        <div className="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-6">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                         </div>
-                        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Share an Idea</h2>
-                        <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-sm">Got a brilliant innovative idea? Share it with the community and get feedback!</p>
-                        <Link to="/post-idea" className="px-8 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5">
+                        <h2 className="text-xl font-bold mb-3">Share an Idea</h2>
+                        <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-sm leading-relaxed">Got a brilliant innovative idea? Share it with the community and get feedback!</p>
+                        <Link to="/post-idea" className="px-10 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0 text-lg">
                             Post New Idea
                         </Link>
                     </div>
+                </div>
+
+                {/* My Activity Section */}
+                <div className="mt-16">
+                    <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                            <span className="w-8 h-1 bg-blue-600 rounded-full"></span>
+                            My Activity
+                        </h2>
+                        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">{posts.length} Posts</p>
+                    </div>
+
+                    {loadingPosts ? (
+                        <div className="flex justify-center items-center py-20">
+                            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+                        </div>
+                    ) : posts.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {posts.map((post) => (
+                                <Link
+                                    to={`/post/${post.id}`}
+                                    key={post.id}
+                                    className="group bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 hover:shadow-lg transition-all flex gap-5 overflow-hidden active:scale-[0.98]"
+                                >
+                                    {post.image && (
+                                        <div className="w-24 h-24 rounded-xl overflow-hidden shrink-0 border border-slate-50 dark:border-slate-800">
+                                            <img src={post.image} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        </div>
+                                    )}
+                                    <div className="flex-1 min-w-0 flex flex-col justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                                {new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </p>
+                                            <h4 className="font-bold text-lg leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                                                {post.title}
+                                            </h4>
+                                        </div>
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${post.viewStatus === 'PRIVATE' ? 'bg-red-50 text-red-600 dark:bg-red-900/20' :
+                                                post.viewStatus === 'TEAM' ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20' :
+                                                    'bg-green-50 text-green-600 dark:bg-green-900/20'
+                                                }`}>
+                                                {post.viewStatus}
+                                            </span>
+                                            <div className="flex items-center gap-3 text-slate-400 text-xs font-bold">
+                                                <div className="flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                                    </svg>
+                                                    {post._count?.likes || 0}
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                                                    </svg>
+                                                    {post._count?.comments || 0}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800">
+                            <p className="text-slate-500 italic">You haven't posted any ideas yet.</p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
+
 
 export default Dashboard;

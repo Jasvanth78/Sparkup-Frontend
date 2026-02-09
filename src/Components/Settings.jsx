@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api/config';
 import Navbar from './navbar';
+
 import { useNavigate } from 'react-router-dom';
 import { RiInstagramFill } from "react-icons/ri";
-import { FaLinkedinIn } from "react-icons/fa";
+import { FaLinkedinIn, FaGithub, FaGlobe } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { IoMailUnread } from "react-icons/io5";
 import authorPlaceholder from '../assets/author.webp';
 const Settings = () => {
-    // Initialize with default values to avoid "undefined" errors
+
     const [user, setUser] = useState({
         name: '',
         email: '',
@@ -16,6 +19,9 @@ const Settings = () => {
         about: '',
         instagram: '',
         linkedin: '',
+        twitter: '',
+        github: '',
+        website: '',
         skills: []
     });
     const [loading, setLoading] = useState(true);
@@ -51,7 +57,8 @@ const Settings = () => {
                     navigate('/');
                     return;
                 }
-                const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/users/me`, {
+                const response = await axios.get(`${API_BASE_URL}/api/users/me`, {
+
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 setUser({
@@ -60,6 +67,9 @@ const Settings = () => {
                     about: response.data.about || '',
                     instagram: response.data.instagram || '',
                     linkedin: response.data.linkedin || '',
+                    twitter: response.data.twitter || '',
+                    github: response.data.github || '',
+                    website: response.data.website || '',
                     skills: response.data.skills || []
                 });
                 setLoading(false);
@@ -94,7 +104,8 @@ const Settings = () => {
         setSaving(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${import.meta.env.VITE_API_BASE_URL}api/users/${user.id}`, user, {
+            const response = await axios.put(`${API_BASE_URL}/api/users/${user.id}`, user, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success('Profile updated successfully');
@@ -104,6 +115,9 @@ const Settings = () => {
                 about: response.data.about || '',
                 instagram: response.data.instagram || '',
                 linkedin: response.data.linkedin || '',
+                twitter: response.data.twitter || '',
+                github: response.data.github || '',
+                website: response.data.website || '',
                 skills: response.data.skills || []
             });
             setSaving(false);
@@ -186,16 +200,25 @@ const Settings = () => {
                                     className="text-2xl md:text-4xl font-extrabold text-gray-900 dark:text-white text-center md:text-left bg-transparent border-b-2 border-transparent hover:border-gray-200 dark:hover:border-slate-800 focus:border-black dark:focus:border-white focus:outline-none transition-all w-full md:w-auto min-w-[200px]"
                                     placeholder="Your Name"
                                 />
-                                <p className="text-gray-500 dark:text-slate-400 font-medium mt-2 md:text-lg">Innovation Enthusiast</p>
+
 
                                 <div className="flex gap-4 mt-6 text-gray-600 dark:text-slate-400 font-bold text-xs md:text-sm">
-                                    <a href={user.instagram || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-gray-600 dark:text-slate-400 font-bold text-xs md:text-sm shadow-sm transition-all hover:-translate-y-1 ${user.instagram ? 'bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-900/40' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
+                                    <a href={user.instagram || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-sm transition-all hover:-translate-y-1 ${user.instagram ? 'bg-pink-100 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 hover:bg-pink-200 dark:hover:bg-pink-900/40' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
                                         <RiInstagramFill size={20} />
                                     </a>
-                                    <a href={user.linkedin || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-gray-600 dark:text-slate-400 font-bold text-xs md:text-sm shadow-sm transition-all hover:-translate-y-1 ${user.linkedin ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/40' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
+                                    <a href={user.linkedin || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-sm transition-all hover:-translate-y-1 ${user.linkedin ? 'bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/40' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
                                         <FaLinkedinIn size={20} />
                                     </a>
-                                    <a href={`mailto:${user.email}`} className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xs md:text-sm shadow-sm cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900/40 transition-all hover:-translate-y-1">
+                                    <a href={user.twitter || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-sm transition-all hover:-translate-y-1 ${user.twitter ? 'bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
+                                        <FaXTwitter size={20} />
+                                    </a>
+                                    <a href={user.github || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-sm transition-all hover:-translate-y-1 ${user.github ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-slate-700' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
+                                        <FaGithub size={20} />
+                                    </a>
+                                    <a href={user.website || '#'} target="_blank" rel="noopener noreferrer" className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-sm transition-all hover:-translate-y-1 ${user.website ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/40' : 'bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 opacity-50 cursor-not-allowed'}`}>
+                                        <FaGlobe size={20} />
+                                    </a>
+                                    <a href={`mailto:${user.email}`} className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-100 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 flex items-center justify-center shadow-sm cursor-pointer hover:bg-orange-200 dark:hover:bg-orange-900/40 transition-all hover:-translate-y-1">
                                         <IoMailUnread size={20} />
                                     </a>
                                 </div>
@@ -270,6 +293,42 @@ const Settings = () => {
                                         placeholder="LinkedIn Profile URL"
                                     />
                                 </div>
+
+                                <div className="bg-[#333] rounded-2xl p-2 pl-4 flex items-center border border-[#444] focus-within:border-blue-400 transition-colors">
+                                    <FaXTwitter className="w-5 h-5 text-[#1DA1F2] mr-3" />
+                                    <input
+                                        type="text"
+                                        name="twitter"
+                                        value={user.twitter}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent py-3 text-base font-medium text-white placeholder-gray-500 focus:outline-none"
+                                        placeholder="Twitter (X) Profile URL"
+                                    />
+                                </div>
+
+                                <div className="bg-[#333] rounded-2xl p-2 pl-4 flex items-center border border-[#444] focus-within:border-gray-300 transition-colors">
+                                    <FaGithub className="w-5 h-5 text-white mr-3" />
+                                    <input
+                                        type="text"
+                                        name="github"
+                                        value={user.github}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent py-3 text-base font-medium text-white placeholder-gray-500 focus:outline-none"
+                                        placeholder="GitHub Profile URL"
+                                    />
+                                </div>
+
+                                <div className="bg-[#333] rounded-2xl p-2 pl-4 flex items-center border border-[#444] focus-within:border-emerald-500 transition-colors">
+                                    <FaGlobe className="w-5 h-5 text-emerald-500 mr-3" />
+                                    <input
+                                        type="text"
+                                        name="website"
+                                        value={user.website}
+                                        onChange={handleChange}
+                                        className="w-full bg-transparent py-3 text-base font-medium text-white placeholder-gray-500 focus:outline-none"
+                                        placeholder="Personal Website URL"
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-4 pt-4 border-t border-[#444]">
@@ -291,14 +350,7 @@ const Settings = () => {
                             </div>
 
 
-                            <div className="space-y-4">
-                                <label className="text-gray-400 text-sm font-bold uppercase tracking-wider ml-1">Recent Activity</label>
-                                <div className="bg-[#333] rounded-3xl p-5 flex items-center gap-4 border border-[#444] hover:bg-[#3a3a3a] transition-colors cursor-pointer group">
 
-
-                                    <span className="text-xs text-indigo-400 font-semibold bg-indigo-500/10 px-3 py-1 rounded-full">Now</span>
-                                </div>
-                            </div>
                         </div>
 
                     </div>

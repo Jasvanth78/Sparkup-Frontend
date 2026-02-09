@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { API_BASE_URL } from '../api/config'
+
 
 export default function Register() {
     const [name, setName] = useState("")
@@ -13,8 +15,10 @@ export default function Register() {
     const [isAdmin, setIsAdmin] = useState(false)
     const navigate = useNavigate()
 
-    const apiBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, '')
-    const api = `${apiBase}/api/${isAdmin ? 'admin' : 'users'}/register`
+
+    const api = `${API_BASE_URL}/api/${isAdmin ? 'admin' : 'users'}/register`
+
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()

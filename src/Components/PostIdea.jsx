@@ -2,7 +2,9 @@ import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../api/config';
 import Navbar from './navbar';
+
 import {
     FaImage,
     FaGlobeAmericas,
@@ -31,7 +33,7 @@ const PostIdea = () => {
 
             setFetchingTeams(true);
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/my-teams`, {
+                const res = await axios.get(`${API_BASE_URL}/api/teams/my-teams`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 // Combine created and member teams
@@ -116,12 +118,12 @@ const PostIdea = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const userRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/users/me`, {
+            const userRes = await axios.get(`${API_BASE_URL}/api/users/me`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const userId = userRes.data.id;
 
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/posts`, {
+            await axios.post(`${API_BASE_URL}/api/posts`, {
                 ...formData,
                 authorId: userId,
                 teamIds: formData.viewStatus === 'TEAM' ? formData.teamIds : []
@@ -131,6 +133,7 @@ const PostIdea = () => {
 
             toast.success('Idea posted successfully!');
             navigate('/Home');
+
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to post idea');
         } finally {
@@ -309,11 +312,10 @@ const PostIdea = () => {
                                                 teams.map(team => (
                                                     <label
                                                         key={team.id}
-                                                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2 ${
-                                                            formData.teamIds.includes(team.id)
-                                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                                : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                                        }`}
+                                                        className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all border-2 ${formData.teamIds.includes(team.id)
+                                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                            : 'border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                                            }`}
                                                     >
                                                         <input
                                                             type="checkbox"

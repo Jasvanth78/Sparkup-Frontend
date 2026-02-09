@@ -13,7 +13,9 @@ import Register from './Components/Register'
 import Support from './Components/Support'
 import ProtectedRoute from './Components/ProtectedRoute'
 import Notification from './Components/Notification'
+import UserProfile from './Components/UserProfile'
 import { ToastContainer } from 'react-toastify';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -24,21 +26,23 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/Register" element={<Register />} />
-          <Route path="/Home" element={<Home />} />
-          <Route path="/Notifications" element={<Notification />} />
-          <Route path="/Settings" element={<Settings />} />
-          <Route path="/Dashboard" element={<Dashboard />} />
-          <Route path="/post-idea" element={<PostIdea />} />
-          <Route path="/post/:id" element={<PostDetail />} />
+          <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/Notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
+          <Route path="/Settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/Dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/post-idea" element={<ProtectedRoute><PostIdea /></ProtectedRoute>} />
+          <Route path="/post/:id" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
           <Route path="/AdminDashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-          <Route path="/Teams" element={<Teams />} />
+          <Route path="/Teams" element={<ProtectedRoute><Teams /></ProtectedRoute>} />
           <Route path="/Passwordreset" element={<Passwordreset />} />
-          <Route path="/Support" element={<Support />} />
+          <Route path="/Support" element={<ProtectedRoute><Support /></ProtectedRoute>} />
+          <Route path="/profile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
         </Routes>
       </Router>
       <ToastContainer position="bottom-right" theme="colored" />
     </div>
   )
 }
+
 
 export default App

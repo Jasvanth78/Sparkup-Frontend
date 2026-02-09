@@ -22,7 +22,7 @@ const supportChannels = [
     title: "Book a call",
     description: "Schedule a 15-minute call to troubleshoot together or walk through a feature.",
     action: "Pick a time",
-    href: "https://cal.com/", 
+    href: "https://cal.com/",
     icon: <FiHeadphones className="w-5 h-5" />,
   },
 ];
@@ -51,24 +51,24 @@ const Support = () => {
   const [comments, setComments] = useState([
     {
       id: 1,
-      author: "John Doe",
-      avatar: "JD",
+      author: "Manoj",
+      avatar: "MJ",
       timestamp: "2 hours ago",
       text: "Great support resources! Really helped me get started.",
       likes: 5
     },
     {
       id: 2,
-      author: "Sarah Johnson",
-      avatar: "SJ",
+      author: "Devaraj",
+      avatar: "DJ",
       timestamp: "1 day ago",
       text: "The email support team was super helpful with my issue.",
       likes: 3
     },
     {
       id: 3,
-      author: "Mike Chen",
-      avatar: "MC",
+      author: "Sibi",
+      avatar: "SB",
       timestamp: "3 days ago",
       text: "Quick response time, very impressed with the service!",
       likes: 8
@@ -163,7 +163,7 @@ const Support = () => {
             </div>
             <div className="divide-y divide-slate-200 dark:divide-slate-800">
               {faqs.map((faq) => (
-                <details key={faq.question} className="group py-3" open={faq.question.includes("fastest")}> 
+                <details key={faq.question} className="group py-3" open={faq.question.includes("fastest")}>
                   <summary className="flex items-center justify-between cursor-pointer list-none">
                     <span className="font-medium text-slate-800 dark:text-slate-100 group-open:text-blue-600">{faq.question}</span>
                     <span className="text-slate-400 group-open:rotate-180 transition-transform">⌄</span>
@@ -215,7 +215,7 @@ const Support = () => {
         </section>
       </main>
 
-     
+
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 border-t border-slate-200 dark:border-slate-800">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -227,13 +227,13 @@ const Support = () => {
             {comments.map((comment) => (
               <div key={comment.id} className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 hover:shadow-md transition-shadow">
                 <div className="flex gap-4">
-                  
+
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-semibold">
                       {comment.avatar}
                     </div>
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold text-slate-900 dark:text-white">{comment.author}</span>

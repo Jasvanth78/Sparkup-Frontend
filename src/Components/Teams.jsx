@@ -6,7 +6,9 @@ import {
     FaTimes, FaSearch, FaPaperPlane, FaShareAlt, FaEllipsisH,
     FaRegFileAlt, FaChevronRight, FaInfoCircle, FaRocket, FaUserFriends
 } from 'react-icons/fa';
+import { API_BASE_URL } from '../api/config';
 import Navbar from './navbar';
+
 
 const Teams = () => {
     const [teams, setTeams] = useState([]);
@@ -44,7 +46,8 @@ const Teams = () => {
 
     const fetchTeams = async () => {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/my-teams`, {
+            const response = await axios.get(`${API_BASE_URL}/api/teams/my-teams`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             const all = [...response.data.createdTeams, ...response.data.memberTeams];
@@ -60,7 +63,8 @@ const Teams = () => {
 
     const fetchMessages = async (teamId) => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/${teamId}/messages`, {
+            const res = await axios.get(`${API_BASE_URL}/api/teams/${teamId}/messages`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessages(res.data);
@@ -71,7 +75,8 @@ const Teams = () => {
         e.preventDefault();
         if (!newMessage.trim() || !activeTeam) return;
         try {
-            const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}/messages`,
+            const res = await axios.post(`${API_BASE_URL}/api/teams/${activeTeam.id}/messages`,
+
                 { content: newMessage },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -83,7 +88,8 @@ const Teams = () => {
     const handleCreateTeam = async (e) => {
         e.preventDefault();
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/teams`,
+            await axios.post(`${API_BASE_URL}/api/teams`,
+
                 { name: newTeamName, description: newTeamDesc },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -97,7 +103,8 @@ const Teams = () => {
     const handleSearchUsers = async () => {
         if (!searchUser) return;
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/users`, {
+            const response = await axios.get(`${API_BASE_URL}/api/users`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             const filtered = response.data.filter(u =>
@@ -112,14 +119,16 @@ const Teams = () => {
 
     const handleAddMember = async (userId) => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}/members`,
+            await axios.post(`${API_BASE_URL}/api/teams/${activeTeam.id}/members`,
+
                 { userId },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             toast.success("Member added!");
             setSearchUser("");
             setFoundUsers([]);
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/teams/${activeTeam.id}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setActiveTeam(response.data);
@@ -132,11 +141,13 @@ const Teams = () => {
     const handleRemoveMember = async (userId) => {
         if (!window.confirm("Remove this member?")) return;
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}/members/${userId}`, {
+            await axios.delete(`${API_BASE_URL}/api/teams/${activeTeam.id}/members/${userId}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success("Member removed");
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/teams/${activeTeam.id}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setActiveTeam(response.data);
@@ -149,7 +160,8 @@ const Teams = () => {
     const handleDeleteTeam = async () => {
         if (!window.confirm("FATAL: Delete workspace?")) return;
         try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}api/teams/${activeTeam.id}`, {
+            await axios.delete(`${API_BASE_URL}/api/teams/${activeTeam.id}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             toast.success("Team deleted");

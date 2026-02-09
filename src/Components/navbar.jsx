@@ -6,6 +6,8 @@ import { useTheme } from "../Context/ThemeContext";
 import authorPlaceholder from "../assets/author.webp";
 import { io } from "socket.io-client";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../api/config";
+
 
 const ProfileMenu = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -137,7 +139,8 @@ const Navbar = () => {
     try {
       if (!token) return;
       const userId = parseJwt(token).id;
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/notifications/unread/${userId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/notifications/unread/${userId}`, {
+
         headers: { Authorization: `Bearer ${token}` }
       });
       setUnreadCount(response.data.unreadCount);
@@ -162,8 +165,9 @@ const Navbar = () => {
 
         if (token) {
           const endpoint = role === 'ADMIN'
-            ? `${import.meta.env.VITE_API_BASE_URL}api/admin/me`
-            : `${import.meta.env.VITE_API_BASE_URL}api/users/me`;
+            ? `${API_BASE_URL}/api/admin/me`
+            : `${API_BASE_URL}/api/users/me`;
+
 
           const response = await axios.get(endpoint, {
             headers: { Authorization: `Bearer ${token}` }
@@ -185,6 +189,12 @@ const Navbar = () => {
         }
       } catch (error) {
         console.error("Failed to fetch user in navbar", error);
+        if (error.response?.status === 401 || error.response?.status === 404) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('role');
+          window.location.href = '/';
+        }
       }
     };
     fetchUser();
@@ -193,7 +203,8 @@ const Navbar = () => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const socket = io(import.meta.env.VITE_API_BASE_URL, {
+    const socket = io(API_BASE_URL, {
+
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
@@ -257,9 +268,7 @@ const Navbar = () => {
 
 
             <div className="hidden lg:flex items-center gap-4">
-              <button className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg shadow-sm transition-all focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
-                Invite Your Friends
-              </button>
+
 
               <Link to="/Notifications" className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors">
                 <FaBell className="w-5 h-5 text-gray-600 dark:text-slate-400" />

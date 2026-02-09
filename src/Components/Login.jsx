@@ -5,6 +5,8 @@ import axios from 'axios'
 import Home from './Home'
 import { toast } from 'react-toastify'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import { API_BASE_URL } from '../api/config'
+
 export default function Login() {
 
     const [email, setEmail] = useState("")
@@ -20,8 +22,8 @@ export default function Login() {
     }
 
 
-    const apiBase = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, '')
-    const api = `${apiBase}/api/${isAdmin ? 'admin' : 'users'}/login`
+    const api = `${API_BASE_URL}/api/${isAdmin ? 'admin' : 'users'}/login`
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -47,7 +49,8 @@ export default function Login() {
             toast.error(errorMessage)
         }
     }
-    const passwordapi = `${import.meta.env.VITE_API_BASE_URL}api/reset`
+    const passwordapi = `${API_BASE_URL}/api/reset`
+
 
 
     const handlePasswordReset = () => {

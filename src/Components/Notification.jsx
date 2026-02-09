@@ -4,6 +4,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { FaBell, FaCheck, FaTrash, FaCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
+import { API_BASE_URL } from '../api/config';
+
 
 const Notification = () => {
     const [notifications, setNotifications] = useState([]);
@@ -24,7 +26,8 @@ const Notification = () => {
         if (!userId) return;
 
         // Initialize Socket.IO connection for real-time notifications
-        const socket = io(import.meta.env.VITE_API_BASE_URL, {
+        const socket = io(API_BASE_URL, {
+
             reconnection: true,
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
@@ -43,7 +46,7 @@ const Notification = () => {
 
         // Listen for notification read events
         socket.on('notificationRead', (data) => {
-            setNotifications(prev => 
+            setNotifications(prev =>
                 prev.map(n => n.id === data.notificationId ? { ...n, isRead: true } : n)
             );
         });
@@ -68,7 +71,8 @@ const Notification = () => {
             const token = localStorage.getItem('token');
             const decoded = parseJwt(token);
             const fetchUserId = decoded.id;
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}api/notifications/${fetchUserId}`, {
+            const response = await axios.get(`${API_BASE_URL}/api/notifications/${fetchUserId}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(response.data);
@@ -82,7 +86,8 @@ const Notification = () => {
     const markAsRead = async (id) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}api/notifications/read/${id}`, {}, {
+            await axios.put(`${API_BASE_URL}/api/notifications/read/${id}`, {}, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
@@ -95,7 +100,8 @@ const Notification = () => {
         try {
             const token = localStorage.getItem('token');
             const userId = parseJwt(token).id;
-            await axios.put(`${import.meta.env.VITE_API_BASE_URL}api/notifications/read-all/${userId}`, {}, {
+            await axios.put(`${API_BASE_URL}/api/notifications/read-all/${userId}`, {}, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
@@ -110,7 +116,8 @@ const Notification = () => {
 
             const token = localStorage.getItem('token');
             const userId = parseJwt(token).id;
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}api/notifications/${userId}`, {
+            await axios.delete(`${API_BASE_URL}/api/notifications/${userId}`, {
+
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNotifications([]);
@@ -215,8 +222,8 @@ const Notification = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
                                     className={`relative group p-4 sm:p-5 rounded-xl border transition-all duration-200 ${notification.isRead
-                                            ? 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800'
-                                            : 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30'
+                                        ? 'bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-800'
+                                        : 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-100 dark:border-blue-900/30'
                                         } hover:shadow-md cursor-pointer`}
                                     onClick={() => !notification.isRead && markAsRead(notification.id)}
                                 >

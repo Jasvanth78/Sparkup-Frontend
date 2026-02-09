@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { API_BASE_URL } from '../api/config'
+
 
 export default function Passwordreset() {
   const [step, setStep] = useState(1)
@@ -12,7 +14,6 @@ export default function Passwordreset() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  const apiBase = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault()
@@ -24,7 +25,8 @@ export default function Passwordreset() {
     setLoading(true)
     try {
       console.log('Sending OTP to:', email)
-      const response = await axios.post(`${apiBase}/api/password/reset`, { email })
+      const response = await axios.post(`${API_BASE_URL}/api/password/reset`, { email })
+
       console.log('Server response:', response.data)
 
       if (response.status === 200) {
@@ -53,10 +55,11 @@ export default function Passwordreset() {
 
     setLoading(true)
     try {
-      await axios.post(`${apiBase}/api/password/reset/verify`, {
+      await axios.post(`${API_BASE_URL}/api/password/reset/verify`, {
         otp,
         password
       })
+
       toast.success('Password reset successfully')
       navigate('/')
     } catch (error) {
@@ -66,15 +69,16 @@ export default function Passwordreset() {
     }
   }
 
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 font-sans transition-colors duration-300">
       <div className="max-w-4xl w-full bg-white dark:bg-slate-900 rounded-[2rem] shadow-2xl overflow-hidden grid md:grid-cols-2 border border-transparent dark:border-slate-800">
 
-       
+
         <div className="bg-blue-50 dark:bg-slate-800/50 p-12 flex flex-col items-center justify-center text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-blue-500/5"></div>
           <div className="relative z-10">
-           
+
             <svg className="w-64 h-64 drop-shadow-xl transform hover:scale-105 transition-transform duration-500" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1S160 493.2 160 480V396.4c0-4 1.5-7.8 4.2-10.7l167.6-182.9c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4z" fill="#3B82F6" />
               <path opacity="0.5" d="M160 480V396.4c0-4 1.5-7.8 4.2-10.7l167.6-182.9c5.8-6.3 5.6-16-.4-22s-15.7-6.4-22-.7L106 360.8 17.7 316.6C7.1 311.3 .3 300.7 0 288.9s5.9-22.8 16.1-28.7l448-256c10.7-6.1 23.9-5.5 34 1.4L498.1 5.6c10.1 7 15.4 19.1 13.5 31.2l-64 416c-1.5 9.7-7.4 18.2-16 23s-18.9 5.4-28 1.6L284 427.7l-68.5 74.1c-8.9 9.7-22.9 12.9-35.2 8.1z" fill="#60A5FA" />

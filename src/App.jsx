@@ -14,6 +14,7 @@ import Support from './Components/Support'
 import ProtectedRoute from './Components/ProtectedRoute'
 import Notification from './Components/Notification'
 import UserProfile from './Components/UserProfile'
+import AdminLogin from './Components/AdminLogin'
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,6 +26,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/AdminLogin" element={<AdminLogin />} />
           <Route path="/Register" element={<Register />} />
           <Route path="/Home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/Notifications" element={<ProtectedRoute><Notification /></ProtectedRoute>} />
